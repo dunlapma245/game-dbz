@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragon Ball Draft Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5; /* Light grey background */
+            color: #333; /* Dark text color */
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #00796b; /* Teal color */
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .team {
+            border: 2px solid #00796b;
+            border-radius: 10px;
+            background-color: #ffffff; /* White background for teams */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            width: 30%;
+            padding: 20px;
+        }
+        .character-list {
+            border: 2px solid #00796b;
+            border-radius: 10px;
+            background-color: #ffffff; /* White background for character list */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            width: 30%;
+            padding: 20px;
+            max-height: 400px; /* Set max height for scrollable list */
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+        .character-item {
+            display: flex;
+            align-items: center; /* Center items vertically */
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #00796b; /* Teal border for character items */
+            border-radius: 5px;
+            background-color: #b2dfdb; /* Light teal background for character items */
+            cursor: pointer; /* Pointer cursor on hover */
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+        .character-item img {
+            width: 50px; /* Set character image width */
+            height: 50px; /* Set character image height */
+            margin-right: 10px; /* Space between image and name */
+        }
+        .character-item:hover {
+            background-color: #00796b; /* Darker teal on hover */
+            color: white; /* White text on hover */
+        }
+        .selected {
+            background-color: #ffccbc; /* Light orange background for selected items */
+        }
+        .drafted-characters {
+            list-style-type: none;
+            padding: 0;
+        }
+        .draft-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #00796b; /* Teal button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .draft-button:hover {
+            background-color: #004d40; /* Darker teal on hover */
+        }
+        #log {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #d32f2f; /* Red color for log messages */
+        }
+    </style>
+</head>
+<body>
+    <h1>Dragon Ball Draft Game</h1>
+    <div class="container">
+        <div class="character-list" id="character-list">
+            <h2>Available Characters</h2>
+            <ul id="characters"></ul>
+        </div>
+        <div class="container">
+            <div class="team" id="team1">
+                <h2>Team 1</h2>
+                <ul class="drafted-characters" id="team1-list"></ul>
+            </div>
+            <div class="team" id="team2">
+                <h2>Team 2</h2>
+                <ul class="drafted-characters" id="team2-list"></ul>
+            </div>
+            <div class="team" id="team3">
+                <h2>Team 3</h2>
+                <ul class="drafted-characters" id="team3-list"></ul>
+            </div>
+        </div>
+    </div>
+    <button class="draft-button" id="draft-btn">Draft Character</button>
+    <div id="log"></div>
+
+    <script>
+        const characters = [
+            {name: "Goku", image: "https://img.example.com/goku.png"},
+            {name: "Vegeta", image: "https://img.example.com/vegeta.png"},
+            {name: "Gohan", image: "https://img.example.com/gohan.png"},
+            {name: "Piccolo", image: "https://img.example.com/piccolo.png"},
+            {name: "Krillin", image: "https://img.example.com/krillin.png"},
+            {name: "Trunks", image: "https://img.example.com/trunks.png"},
+            {name: "Android 18", image: "https://img.example.com/android18.png"},
+            {name: "Frieza", image: "https://img.example.com/frieza.png"},
+            {name: "Majin Buu", image: "https://img.example.com/majinbuu.png"},
+            {name: "Cell", image: "https://img.example.com/cell.png"},
+            {name: "Yamcha", image: "https://img.example.com/yamcha.png"},
+            {name: "Tien Shinhan", image: "https://img.example.com/tien.png"},
+            {name: "Chiaotzu", image: "https://img.example.com/chiaotzu.png"},
+            {name: "Bulma", image: "https://img.example.com/bulma.png"},
+            {name: "Master Roshi", image: "https://img.example.com/masterroshi.png"},
+            {name: "Chi-Chi", image: "https://img.example.com/chichi.png"},
+            {name: "Mr. Satan", image: "https://img.example.com/mrsatan.png"},
+            {name: "Dende", image: "https://img.example.com/dende.png"},
+            {name: "Videl", image: "https://img.example.com/videl.png"},
+            {name: "Raditz", image: "https://img.example.com/raditz.png"},
+            {name: "Nappa", image: "https://img.example.com/nappa.png"},
+            {name: "Bardock", image: "https://img.example.com/bardock.png"},
+            {name: "King Vegeta", image: "https://img.example.com/kingvegeto.png"},
+            {name: "Goten", image: "https://img.example.com/goten.png"},
+            {name: "Cabba", image: "https://img.example.com/cabba.png"},
+            {name: "Kale", image: "https://img.example.com/kale.png"},
+            {name: "Caulifla", image: "https://img.example.com/caulifla.png"},
+            {name: "Captain Ginyu", image: "https://img.example.com/captainginyu.png"},
+            {name: "Jeice", image: "https://img.example.com/jeice.png"},
+            {name: "Burter", image: "https://img.example.com/burter.png"},
+            {name: "Recoome", image: "https://img.example.com/recoome.png"},
+            {name: "Guldo", image: "https://img.example.com/guldo.png"},
+            {name: "Zarbon", image: "https://img.example.com/zarbon.png"},
+            {name: "Dodoria", image: "https://img.example.com/dodoria.png"},
+            {name: "Babidi", image: "https://img.example.com/babidi.png"},
+            {name: "Dabura", image: "https://img.example.com/dabura.png"},
+            {name: "Broly", image: "https://img.example.com/broly.png"},
+            {name: "Beerus", image: "https://img.example.com/beerus.png"},
+            {name: "Whis", image: "https://img.example.com/whis.png"},
+            {name: "Shenron", image: "https://img.example.com/shenron.png"},
+        ];
+
+        let teams = [[], [], []]; // Store selected characters for each team
+        let currentTeam = 0; // Track current team (0, 1, 2 for Team 1, Team 2, Team 3)
+        let selectedCharacterIndex = null; // To track the selected character
+
+        // Populate character list
+        function populateCharacterList() {
+            const characterList = document.getElementById('characters');
+            characters.forEach((character, index) => {
+                const li = document.createElement('li');
+                li.className = 'character-item';
+                li.innerHTML = `<img src="${character.image}" alt="${character.name}"> ${character.name}`;
+                li.onclick = () => selectCharacter(index);
+                characterList.appendChild(li);
+            });
+        }
+
+        // Function to handle character selection
+        function selectCharacter(index) {
+            const characterItems = document.querySelectorAll('.character-item');
+            characterItems.forEach((item, i) => {
+                item.classList.remove('selected'); // Remove selected class from all
+            });
+            characterItems[index].classList.add('selected'); // Highlight selected character
+            selectedCharacterIndex = index; // Set selected character index
+        }
+
+        // Function to draft the selected character
+        function draftCharacter() {
+            if (selectedCharacterIndex === null) {
+                document.getElementById('log').innerText = "Please select a character to draft.";
+                return;
+            }
+
+            const character = characters[selectedCharacterIndex];
+
+            // Check if the character has already been drafted
+            if (teams.some(team => team.includes(character.name))) {
+                document.getElementById('log').innerText = `${character.name} has already been drafted.`;
+                return;
+            }
+
+            // Add character to the current team's list
+            teams[currentTeam].push(character.name);
+
+            // Update the team's drafted characters list
+            const teamList = document.getElementById(`team${currentTeam + 1}-list`);
+            const li = document.createElement('li');
+            li.innerText = character.name;
+            teamList.appendChild(li);
+
+            // Remove character from available list
+            const characterList = document.getElementById('characters');
+            characterList.removeChild(characterList.children[selectedCharacterIndex]);
+
+            // Reset selection
+            selectedCharacterIndex = null;
+
+            // Move to the next team
+            currentTeam = (currentTeam + 1) % teams.length;
+
+            // Update log
+            document.getElementById('log').innerText = `${character.name} drafted to Team ${currentTeam + 1}`;
+        }
+
+        // Add event listener for the draft button
+        document.getElementById('draft-btn').addEventListener('click', draftCharacter);
+
+        // Initialize character list
+        populateCharacterList();
+    </script>
+</body>
+</html>
